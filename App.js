@@ -6,9 +6,12 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthProvider } from './src/services/AuthService'
 import * as SecureStore from 'expo-secure-store'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { auth } from './src/services/firebase'
+import { getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth'
+
 import Login from './src/screens/Login'
 import Main from './src/navigator/Main'
+import { createUser } from './src/services/ApiService'
 
 function Loading() {
     return (
@@ -21,12 +24,27 @@ function Loading() {
 const Stack = createNativeStackNavigator()
 
 function App() {
-    const auth = getAuth()
 
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        getRedirectResult(auth)
+            .then((result) => {
+                // The signed-in user info.
+                const user = result.user
+                createUser(user)
+            }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code
+                const errorMessage = error.message
+                // The email of the user's account used.
+                const email = error.email
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error)
+                // ...
+            })
+
         const subscriber = onAuthStateChanged(auth, (user) => {
             console.log(user)
             setUser(user)

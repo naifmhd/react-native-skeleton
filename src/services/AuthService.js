@@ -1,13 +1,13 @@
 
 import React, { createContext, useState } from 'react'
 import './firebase'
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, signOut } from 'firebase/auth'
-
+import { getAuth, getRedirectResult, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, signOut } from 'firebase/auth'
+import { auth } from './firebase'
 export const AuthContext = createContext({})
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
-    const auth = getAuth()
+
     const provider = new GoogleAuthProvider()
 
     return (
@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
                 loginWithGoogle: async () => {
                     console.log("google")
                     signInWithRedirect(auth, provider)
+
+
                 },
                 login: async (email, password) => {
                     try {
